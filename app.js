@@ -36,7 +36,7 @@ app.use('/posts', auth, postRouter)
 app.use('/categories', auth, categoryRouter)
 app.use('/tags', auth, tagRouter)
 
-//middlewares
+//middlewares 
 app.use(notFound)
 app.use(errorHandler);
 
