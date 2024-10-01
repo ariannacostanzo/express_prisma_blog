@@ -25,21 +25,24 @@ app.use(express.json());
 
 //cors
 const corsOptions = {
-    origin: 'https://localhost:8000'
-}
+  origin: "http://localhost:5173",
+};
 app.use(cors(corsOptions))
 
 //rotte
-app.use('/auth', authRouter)
+// app.use('/auth', authRouter)
 
-app.use('/posts', auth, postRouter)
-app.use('/categories', auth, categoryRouter)
-app.use('/tags', auth, tagRouter)
+// app.use('/posts', auth, postRouter)
+// app.use('/categories', auth, categoryRouter)
+// app.use('/tags', auth, tagRouter)
+app.use('/posts',  postRouter)
+app.use('/categories',  categoryRouter)
+app.use('/tags',  tagRouter)
 
 //middlewares 
 app.use(notFound)
 app.use(errorHandler);
-
+ 
 
 //avvio del server
 app.listen(port, ()=> { 

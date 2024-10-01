@@ -26,49 +26,85 @@ const bodyData = {
   title: {
     in: ["body"],
     notEmpty: {
-      errorMessage: "title è un campo obbligatorio",
+      errorMessage: "Il titolo è un campo obbligatorio",
       bail: true,
     },
     isString: {
-      errorMessage: "title deve essere una stringa",
+      errorMessage: "Il titolo deve essere una stringa",
       bail: true,
     },
-    isLength: {
-      errorMessage: "title deve essere di almeno 3 caratteri",
-      options: { min: 3 },
+    custom: {
+      options: (value) => {
+        if (value.length <= 3) {
+          throw new Error("Il titolo deve superare 3 caratteri");
+        }
+        if (value.length >= 100) {
+          throw new Error("Il titolo non può superare i 100 caratteri");
+        }
+        return true;
+      },
     },
   },
   content: {
     in: ["body"],
     notEmpty: {
-      errorMessage: "content è un campo obbligatorio",
+      errorMessage: "La descrizione è un campo obbligatorio",
       bail: true,
     },
     isString: {
-      errorMessage: "content deve essere una stringa",
+      errorMessage: "La descrizione deve essere una stringa",
       bail: true,
     },
-    isLength: {
-      errorMessage: "content deve essere di almeno 3 caratteri",
-      options: { min: 3 },
+    custom: {
+      options: (value) => {
+        if (value.length <= 3) {
+          throw new Error("La descrizione deve superare 3 caratteri");
+        }
+        if (value.length >= 100) {
+          throw new Error("La descrizione non può superare i 100 caratteri");
+        }
+        return true;
+      },
+    },
+  },
+  section: {
+    in: ["body"],
+    notEmpty: {
+      errorMessage: "Il contenuto è un campo obbligatorio",
+      bail: true,
+    },
+    isString: {
+      errorMessage: "Il contenuto deve essere una stringa",
+      bail: true,
+    },
+    custom: {
+      options: (value) => {
+        if (value.length <= 3) {
+          throw new Error("Il contenuto deve superare 3 caratteri");
+        }
+        if (value.length >= 2000) {
+          throw new Error("Il titolo non può superare i 2000 caratteri");
+        }
+        return true;
+      },
     },
   },
   image: {
     in: ["body"],
     optional: { nullable: true },
     isString: {
-      errorMessage: "image deve essere una stringa",
+      errorMessage: "Immagine deve essere una stringa",
       bail: true,
     },
   },
   published: {
     in: ["body"],
     notEmpty: {
-      errorMessage: "published è un campo obbligatorio",
+      errorMessage: "Pubblicato è un campo obbligatorio",
       bail: true,
     },
     isBoolean: {
-      errorMessage: "published deve essere un booleano",
+      errorMessage: "Pubblicato deve essere un booleano",
       bail: true,
     },
   },
@@ -76,7 +112,7 @@ const bodyData = {
     in: ["body"],
     optional: { nullable: true },
     isInt: {
-      errorMessage: "Category Id deve essere un numero",
+      errorMessage: "Devi scegliere una categoria",
       bail: true,
     },
     custom: {

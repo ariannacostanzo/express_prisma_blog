@@ -19,6 +19,7 @@ model Post {
   slug       String    @unique
   image      String?
   content    String
+  section    String  @db.Text
   published  Boolean
   category   Category? @relation(fields: [categoryId], references: [id])
   categoryId Int?

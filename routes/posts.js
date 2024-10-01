@@ -8,6 +8,8 @@ const postsValidations = require("../validations/posts.js")
 
 router.post('/', validator(postsValidations.bodyData), postController.store)
 router.get('/', postController.index)
+router.get('/latests', postController.latestPosts)
+router.get('/category/:categoryId', postController.getPostsByCategory)
 
 router.use("/:slug", validator(postsValidations.paramSlug)); //qui vale per tutti
 
