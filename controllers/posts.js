@@ -2,11 +2,16 @@ const {PrismaClient} = require("@prisma/client");
 const errorHandler = require("../middlewares/errorHandler");
 const errorHandlerFunction = require("../utils/errorHandlerFunction");
 const prisma = new PrismaClient();
+const baseUrl = "http://localhost:8000";
+const path = require('path');
+const fs = require('fs')
 
 
 const store = async (req, res) => {
+
     const {title, content, categoryId, tags, section} = req.body;
-    const slug = title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-")
+    const slug = title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-");
+    const imageUrl = req.file ? `${baseUrl}/uploads/${req.file.filename}` : null;
 
     const data = {
       title,
@@ -16,7 +21,8 @@ const store = async (req, res) => {
       published: req.body.published ? true : false,
       tags: {
         connect: tags.map(id => ({id}))
-      } 
+      },
+      image: imageUrl
     };
 
      if (categoryId) {
@@ -26,7 +32,7 @@ const store = async (req, res) => {
      }
 
     try {
-        const post = await prisma.post.create({ data });
+        const post = await prisma.post.create({ data });    
         res.status(200).send(post); 
     } catch (error) { 
         errorHandlerFunction(error) 
@@ -175,29 +181,56 @@ const show = async (req, res) => {
 const destroy =  async (req, res) => {
     const slug = req.params.slug;
     try {
-      const post = await prisma.post.delete({ where: { slug }});
+      const post = await prisma.post.findUnique({
+        where: { slug },
+      });
+
+      if (!post) {
+        return res.status(404).json({ message: "Post non trovato" });
+      }
+
+      // Elimina l'immagine associata se esiste
+      if (post.image) {
+        const imageName = post.image.split("/").pop();
+        const imagePath = path.join(__dirname, "../uploads", imageName);
+
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error("Errore durante l'eliminazione dell'immagine:", err);
+          } else {
+            console.log("Immagine eliminata:", post.image);
+          }
+        });
+      }
+      await prisma.post.delete({ where: { slug }});
       res.status(200).json({"message" : `Hai eliminato il post ${slug}`, "data": post});
     } catch (err) {
-      errorHandlerFunction(res, err);
+      errorHandlerFunction(res, err); 
     }
 }
 
 const update = async (req, res) => {
   const slug = req.params.slug;
   const { title, content, categoryId, tags, section } = req.body;
+  const imageUrl = req.file ? `${baseUrl}/uploads/${req.file.filename}` : null; 
 
   const data = {
     title,
-    slug: title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-"),
+    slug: title
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-"),
     content,
     section,
     published: req.body.published ? true : false,
+    image: imageUrl,
     // tags: {
     //     set: tags.map(id => ({id}))
     //   }
   };
 
-  if (categoryId) data.categoryId = categoryId;
+  if (categoryId) data.categoryId = parseInt(categoryId);
   try { 
     const post = await prisma.post.update({ where: { slug }, data });
 

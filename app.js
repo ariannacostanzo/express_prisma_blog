@@ -3,12 +3,14 @@ const express = require("express");
 const app = express();
 const cors = require("cors")
 
+
 //router
 const postRouter = require('./routes/posts.js');
 const categoryRouter = require('./routes/categories.js');
 const tagRouter = require('./routes/tags.js');
 const authRouter = require('./routes/auth.js');
 
+app.use("/uploads", express.static("uploads"));
 
 //middleware
 const notFound = require("./middlewares/notFound.js");

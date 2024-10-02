@@ -90,11 +90,22 @@ const bodyData = {
     },
   },
   image: {
-    in: ["body"],
-    optional: { nullable: true },
-    isString: {
-      errorMessage: "Immagine deve essere una stringa",
-      bail: true,
+    optional: true, 
+    custom: {
+      options: (value, { req }) => {
+        if (!req.file) {
+          return true; 
+        }
+        const validMimeTypes = ["image/jpeg", "image/png"];
+        if (!validMimeTypes.includes(req.file.mimetype)) {
+          throw new Error("Solo file JPEG o PNG sono accettati");
+        }
+        const maxFileSize = 5 * 1024 * 1024; // 5MB
+        if (req.file.size > maxFileSize) {
+          throw new Error("Il file immagine deve essere inferiore a 5MB");
+        }
+        return true; 
+      },
     },
   },
   published: {
